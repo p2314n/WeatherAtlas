@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f3f6ed">
+  <meta name="description" content="Compare starter crop fits with your sowing month, soil, irrigation, and local weather for the Maharashtra pilot.">
+  <title>Farmer tools — WeatherAtlas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/farmers.css">
+</head>
+<body>
+  <div class="farmer-shell">
+    <header class="farmer-topbar">
+      <a class="brand" href="/" aria-label="WeatherAtlas dashboard"><span class="brand-mark">W</span><span>weather<span class="brand-light">atlas</span></span></a>
+      <div class="farmer-header-actions">
+        <label class="language-control" for="farmer-language"><span data-i18n="language">Language</span><select id="farmer-language" aria-label="Choose language"><option value="en">English</option><option value="hi">हिन्दी</option><option value="ta">தமிழ்</option></select></label>
+        <a class="back-link" href="/"><span aria-hidden="true">←</span> <span data-i18n="back">Back to India dashboard</span></a>
+      </div>
+    </header>
+
+    <main>
+      <section class="farmer-hero">
+        <div class="hero-copy">
+          <p class="eyebrow"><span class="leaf-dot">●</span> WEATHERATLAS · <span data-i18n="farmer_tools">FARMER TOOLS</span></p>
+          <h1><span class="hero-line" data-i18n="hero_line1">Plan your next</span><br><span data-i18n="hero_line2">growing season.</span></h1>
+          <p class="hero-description" data-i18n="hero_description">Compare a starter set of crop fits for your location, sowing month, soil, and water access. We’ll add the next week’s local forecast as context.</p>
+          <div class="hero-tags"><span data-i18n="tag_calendar">🌱 Crop calendar</span><span data-i18n="tag_weather">☁ 7-day weather</span><span data-i18n="tag_pilot">📍 Maharashtra pilot</span></div>
+        </div>
+        <div class="hero-art" aria-hidden="true"><div class="sun-disc"></div><div class="field field-back"></div><div class="field field-front"></div><span class="plant plant-one">♧</span><span class="plant plant-two">♧</span><span class="plant plant-three">♧</span><div class="art-label" data-i18n="art_label">Grow with local context</div></div>
+      </section>
+
+      <div class="content-grid">
+        <section class="planner-card" aria-labelledby="planner-title">
+          <div class="card-heading"><div class="step-number">01</div><div><p class="eyebrow" data-i18n="field_profile">YOUR FIELD PROFILE</p><h2 id="planner-title" data-i18n="tell_farm">Tell us about your farm</h2></div></div>
+          <p class="card-intro" data-i18n="field_intro">Use a nearby city for weather context. Field conditions can vary from city forecasts.</p>
+          <form id="crop-form">
+            <label for="crop-city"><span data-i18n="nearby_city">Nearest monitored city</span><span data-i18n="location">LOCATION</span></label>
+            <select id="crop-city" required><option value="">Loading locations…</option></select>
+
+            <label for="crop-month"><span data-i18n="sowing_month">When are you planning to sow?</span><span data-i18n="season">SEASON</span></label>
+            <select id="crop-month" required></select>
+
+            <div class="field-row">
+              <div><label for="crop-soil"><span data-i18n="soil">Soil type</span><span data-i18n="soil_tag">SOIL</span></label>
+                <select id="crop-soil"><option value="unknown" data-i18n="soil_unknown">I’m not sure</option><option value="deep_black" data-i18n="soil_deep">Deep black</option><option value="medium_black" data-i18n="soil_medium">Medium black</option><option value="light" data-i18n="soil_light">Light soil</option><option value="well_drained" data-i18n="soil_well_drained">Well-drained</option><option value="alluvial" data-i18n="soil_alluvial">Alluvial</option></select>
+              </div>
+              <div><label for="crop-water"><span data-i18n="water_access">Water access</span><span data-i18n="irrigation">IRRIGATION</span></label>
+                <select id="crop-water"><option value="rainfed" data-i18n="rainfed">Rainfed</option><option value="limited" data-i18n="limited_irrigation">Limited irrigation</option><option value="assured" data-i18n="assured_irrigation">Assured irrigation</option></select>
+              </div>
+            </div>
+            <button id="compare-button" class="primary-button" type="submit"><span data-i18n="compare">Compare crop fits</span><span aria-hidden="true">→</span></button>
+            <p class="privacy-note" data-i18n="privacy_note">No account needed. Your farm profile is only used to create this comparison.</p>
+          </form>
+        </section>
+
+        <section class="results-panel" aria-labelledby="results-title" aria-live="polite">
+          <div class="results-heading"><div><p class="eyebrow" data-i18n="comparison_step">02 · YOUR COMPARISON</p><h2 id="results-title" data-i18n="overview">Crop fit overview</h2></div><span class="pilot-badge" data-i18n="starter_screen">STARTER SCREEN</span></div>
+          <div id="crop-status" class="empty-state" role="status"><div class="empty-icon" aria-hidden="true">✳</div><strong data-i18n="shortlist">Your shortlist will appear here</strong><p data-i18n="shortlist_intro">Fill in the four farm details to compare crop calendars and weather context.</p><div class="empty-steps"><span data-i18n="step_location">01 · Location</span><span data-i18n="step_month">02 · Sowing month</span><span data-i18n="step_soil">03 · Soil &amp; water</span></div></div>
+          <div id="forecast-strip" class="forecast-strip" hidden></div>
+          <div id="crop-results" class="crop-results"></div>
+        </section>
+      </div>
+
+      <section class="guide-panel">
+        <div class="guide-title"><p class="eyebrow" data-i18n="simple_guide">A SIMPLE GUIDE</p><h2 data-i18n="read_fits">How to read your crop fits</h2><p data-i18n="guide_intro">These are transparent screening scores to help you explore options.</p></div>
+        <div class="guide-items"><article><span>01</span><strong data-i18n="sowing_window">Sowing window</strong><p data-i18n="guide_month">Higher fit when your selected month matches the listed crop calendar.</p></article><article><span>02</span><strong data-i18n="soil_water">Soil &amp; water</strong><p data-i18n="guide_soil">We compare your selections with each crop’s broad starter profile.</p></article><article><span>03</span><strong data-i18n="weather_context">Weather context</strong><p data-i18n="guide_weather">Rain and temperature summarize the next seven days near your selected city.</p></article></div>
+      </section>
+
+      <section class="advisory-callout"><div class="advisory-icon" aria-hidden="true">i</div><div><strong data-i18n="advisory_title">Use this as a starting point, not a sowing instruction.</strong><p data-i18n="advisory_copy">The crop list and scores are not validated for yield or profit, and the forecast only adjusts a score when it overlaps the selected sowing month. Check your district’s local advisory and field conditions.</p></div><a href="https://imdagrimet.gov.in/cropAdvisory_3.php" target="_blank" rel="noreferrer"><span data-i18n="official_advisory">Official IMD Agromet advisories</span> <span aria-hidden="true">↗</span></a></section>
+    </main>
+    <footer><span data-i18n="footer_title">WeatherAtlas · Farmer tools pilot</span><span><span data-i18n="forecast_by">Forecast weather by</span> <a href="https://open-meteo.com/" target="_blank" rel="noreferrer">Open-Meteo</a> · <span data-i18n="local_guidance">Local guidance from IMD / KVK</span></span></footer>
+  </div>
+  <script src="/static/farmers.js"></script>
+</body>
+</html>

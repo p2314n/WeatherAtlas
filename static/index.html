@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f7f2">
+  <title>WeatherAtlas — India</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="WeatherAtlas home">
+        <span class="brand-mark" aria-hidden="true">W</span>
+        <span>weather<span class="brand-light">atlas</span></span>
+      </a>
+      <div class="topbar-right">
+        <a class="farmers-nav-button" href="/farmers"><span aria-hidden="true">🌱</span> Farmer tools</a>
+        <label class="language-control" for="language-select"><span class="sr-only">Language</span><select id="language-select" aria-label="Choose language"><option value="en">English</option><option value="hi">हिन्दी</option><option value="ta">தமிழ்</option></select></label>
+        <span class="live-dot" aria-hidden="true"></span>
+        <span class="live-label">LIVE CONDITIONS</span>
+        <span class="topbar-divider"></span>
+        <span id="top-time" class="top-time">India · --:-- IST</span>
+      </div>
+    </header>
+
+    <main>
+      <section class="intro-row">
+        <div>
+          <p class="eyebrow">NATIONAL WEATHER OVERVIEW</p>
+          <h1>India, at a glance<span class="heading-period">.</span></h1>
+          <p class="intro-copy">Live weather across the subcontinent, city by city.</p>
+        </div>
+        <div class="updated-card">
+          <span class="updated-icon" aria-hidden="true">↻</span>
+          <div><span class="updated-label">LAST UPDATED</span><strong id="updated-at">Loading…</strong></div>
+          <button id="refresh-button" class="refresh-button" type="button" aria-label="Refresh weather" title="Refresh weather">↻</button>
+        </div>
+      </section>
+
+      <div id="page-error" class="page-error" role="alert" hidden></div>
+
+      <section class="map-card" aria-label="Current temperatures across India">
+        <div class="map-heading">
+          <div><h2>State temperature map</h2><p>State colors show the average of city readings · click a city for its forecast</p></div>
+          <span class="map-unit">°C <span>·</span> STATE AVERAGE</span>
+        </div>
+        <div class="map-frame">
+          <div id="map" role="application" aria-label="Interactive map of India"></div>
+          <div class="map-loading" id="map-loading"><span class="spinner"></span><span>Loading India’s weather…</span></div>
+          <div class="map-legend"><span>COOLER</span><i class="legend-gradient"></i><span>WARMER</span></div>
+          <div class="map-count"><span class="count-dot"></span><span id="city-count">Loading cities</span></div>
+        </div>
+      </section>
+
+      <section class="regional-card" aria-label="Regional temperature summary">
+        <div class="section-heading"><div><p class="eyebrow" data-i18n="regionalEyebrow">STATE-LEVEL SNAPSHOT</p><h2 data-i18n="regionalTitle">Regional coverage &amp; temperatures</h2></div><span id="regional-coverage" class="coverage-badge">Waiting for readings</span></div>
+        <div id="regional-summary" class="regional-grid"><p class="alert-empty">Loading state summaries…</p></div>
+        <p class="regional-note">State averages use only the monitored city stations listed here; regions with no station readings are marked as uncovered. These are not full-area gridded averages.</p>
+      </section>
+
+      <section class="alerts-card" aria-label="Forecast heat, cold, and rainfall alerts">
+        <div class="alerts-heading"><div><p class="eyebrow">NEXT 24 HOURS</p><h2 data-i18n="alerts">Weather alerts</h2></div><span id="alerts-updated" class="alerts-updated">Checking forecast…</span></div>
+        <div class="alerts-grid">
+          <article class="alert-group heat-group"><div class="alert-group-heading"><span class="alert-icon heat-icon" aria-hidden="true">☀</span><div><h3 data-i18n="heat">High heat</h3><p>City forecast reaches 40°C or above</p></div></div><div id="heat-alert-list" class="alerts-list"><p class="alert-empty">Checking 107 locations…</p></div></article>
+          <article class="alert-group cold-group"><div class="alert-group-heading"><span class="alert-icon cold-icon" aria-hidden="true">❄</span><div><h3 data-i18n="cold">Cold alert</h3><p>City forecast reaches 5°C or below</p></div></div><div id="cold-alert-list" class="alerts-list"><p class="alert-empty">Checking 107 locations…</p></div></article>
+          <article class="alert-group rain-group"><div class="alert-group-heading"><span class="alert-icon rain-icon" aria-hidden="true">☂</span><div><h3 data-i18n="rain">Heavy rainfall</h3><p>24-hour forecast total reaches 64.5 mm</p></div></div><div id="rain-alert-list" class="alerts-list"><p class="alert-empty">Checking 107 locations…</p></div></article>
+        </div>
+        <p class="alerts-disclaimer">Informational screening from Open-Meteo city forecasts. These are not official IMD warnings.</p>
+        <div class="share-actions"><button id="share-alerts" class="secondary-button" type="button">Share alert summary</button><button id="download-alert-card" class="secondary-button" type="button">Download alert card</button><span id="share-message" role="status"></span></div>
+      </section>
+
+      <section class="imd-card" aria-label="Official IMD district warnings">
+        <div class="section-heading"><div><p class="eyebrow">OFFICIAL SOURCE COMPARISON</p><h2>IMD district warnings</h2></div><a class="secondary-button" href="https://mausam.imd.gov.in/responsive/districtWiseWarningGIS.php" target="_blank" rel="noreferrer">Open official IMD map ↗</a></div>
+        <p id="imd-warning-message" class="regional-note">Checking the official warning feed…</p>
+        <div id="imd-warning-list" class="imd-warning-list"></div>
+        <p class="regional-note">IMD warnings are official. WeatherAtlas’s city thresholds are separate screening estimates. District names and coverage may differ.</p>
+      </section>
+
+      <section class="forecast-card" aria-label="Selected city forecast">
+        <div class="forecast-heading">
+          <div>
+            <p class="eyebrow" data-i18n="cityForecast">CITY FORECAST</p>
+            <h2 id="selected-city">Choose a city</h2>
+            <p id="forecast-caption" class="forecast-caption">Select a marker on the map to see the next 3 days.</p>
+          </div>
+          <div class="chart-legend"><span><i class="legend-temp"></i>Open-Meteo forecast</span><span><i class="legend-ml"></i>WeatherAtlas ML</span><span><i class="legend-rain"></i>Rain probability</span></div>
+        </div>
+        <div class="chart-wrap"><canvas id="forecast-chart" aria-label="Hourly temperature and precipitation probability chart"></canvas></div>
+        <div id="forecast-message" class="forecast-message">Select a city to load its hourly forecast.</div>
+      </section>
+
+      <section class="ml-dashboard" aria-label="Machine learning predictions and model accuracy">
+        <article class="ml-card">
+          <div class="ml-card-heading"><div><p class="eyebrow">SHORT-TERM OUTLOOK</p><h2 data-i18n="predictions">WeatherAtlas predictions</h2></div><span class="model-badge">XGBOOST</span></div>
+          <p class="ml-description">Compare the model’s temperature estimate with Open-Meteo’s forecast and the persistence baseline.</p>
+          <div class="table-scroll"><table><thead><tr><th>Horizon</th><th>Model · 90% range</th><th>Open-Meteo</th><th>Same as now</th></tr></thead><tbody id="prediction-rows"><tr><td colspan="4">Loading predictions…</td></tr></tbody></table></div>
+          <div id="prediction-explanation" class="explanation-box" role="status">Prediction context will appear when a city is selected.</div>
+          <div id="prediction-message" class="ml-message" role="status"></div>
+        </article>
+        <article class="ml-card">
+          <div class="ml-card-heading"><div><p class="eyebrow">HELD-OUT EVALUATION</p><h2 data-i18n="accuracy">Model accuracy</h2></div><span class="accuracy-badge">MAE · RMSE</span></div>
+          <p class="ml-description">Lower errors are better. Time holdout uses later dates; spatial holdout tests three cities excluded from model fitting.</p>
+          <div class="table-scroll"><table><thead><tr><th>Horizon</th><th>Time model<br>MAE / RMSE</th><th>Persistence<br>MAE / RMSE</th><th>Unseen cities<br>MAE / RMSE</th><th>90% range<br>coverage</th></tr></thead><tbody id="accuracy-rows"><tr><td colspan="5">Loading saved report…</td></tr></tbody></table></div>
+          <details class="city-breakdown"><summary>View time-holdout errors by city</summary><div class="table-scroll"><table><thead><tr><th>City</th><th>Horizon</th><th>MAE</th><th>RMSE</th><th>Samples</th></tr></thead><tbody id="city-accuracy-rows"></tbody></table></div></details>
+          <div id="accuracy-message" class="ml-message" role="status"></div>
+        </article>
+      </section>
+      <section class="verification-card" aria-label="Observed forecast verification">
+        <div class="section-heading"><div><p class="eyebrow">REAL-WORLD TRACK RECORD</p><h2>Forecasts checked against observations</h2></div><span id="verification-count" class="coverage-badge">Collecting forecasts</span></div>
+        <p class="regional-note">Predictions are saved when you select a city and checked against Open-Meteo’s archived hourly observations after a 5-day data delay. Results accumulate as you use the app.</p>
+        <div class="table-scroll"><table><thead><tr><th>Horizon</th><th>WeatherAtlas MAE</th><th>Persistence MAE</th><th>Open-Meteo MAE</th><th>Samples</th></tr></thead><tbody id="verification-rows"><tr><td colspan="5">Loading verification history…</td></tr></tbody></table></div>
+        <p id="verification-note" class="ml-message" role="status"></p>
+      </section>
+    </main>
+    <footer><span>Weather data by <a href="https://open-meteo.com/" target="_blank" rel="noreferrer">Open-Meteo</a> · Boundaries: <a href="https://github.com/Vardhan-Systems/vardhan-maps" target="_blank" rel="noreferrer">Vardhan Maps / OpenStreetMap</a></span><span>State color = mean of available city readings · Times in India Standard Time</span></footer>
+  </div>
+
+  <section id="chat-panel" class="chat-panel" role="dialog" aria-label="WeatherAtlas weather assistant" aria-modal="false" hidden>
+    <header class="chat-header"><div><strong>WeatherAtlas assistant</strong><span>Quick answers from this dashboard</span></div><button id="chat-close" type="button" aria-label="Close chat">×</button></header>
+    <div id="chat-messages" class="chat-messages" aria-live="polite" aria-relevant="additions">
+      <div class="chat-bubble bot-bubble">Hi! Ask about city weather, alerts, model accuracy, or the Crop suitability assistant.</div>
+    </div>
+    <div class="chat-suggestions" aria-label="Example questions">
+      <button type="button" data-question="Which city is hottest?">Hottest city?</button>
+      <button type="button" data-question="Are there any weather alerts?">Any alerts?</button>
+      <button type="button" data-question="How accurate is the model?">Model accuracy?</button>
+      <button type="button" data-question="What crop matches my farm?">Crop fit?</button>
+    </div>
+    <form id="chat-form" class="chat-form">
+      <label class="sr-only" for="chat-input">Ask a weather question</label>
+      <input id="chat-input" type="text" maxlength="220" placeholder="Ask about India’s weather…" autocomplete="off" required>
+      <button type="submit" aria-label="Send message">Send</button>
+    </form>
+    <p class="chat-disclaimer">Rule-based helper · answers from the loaded dashboard data</p>
+  </section>
+  <button id="chat-toggle" class="chat-toggle" type="button" aria-expanded="false" aria-controls="chat-panel" aria-label="Open WeatherAtlas assistant">☁ <span>Ask WeatherAtlas</span></button>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+  <script src="/static/app.js"></script>
+</body>
+</html>
